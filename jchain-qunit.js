@@ -351,8 +351,10 @@ catalogs.forEach(function(current,index, array){
     assert.deepEqual( this.chain[current](this.entryKeyNULL), _undefined,
                      current + " : returns undefined entry from catalogs {defaults:{},options:{}}." );
   });
-  /*-- 2. custom catalog initialized --*/
-  QUnit.test( "default catalog initialized", function( assert ) {
+  /*
+   * -- 2. custom catalog initialized --
+   */
+  QUnit.test( "only default catalog initialized", function( assert ) {
     var value = {key1:'value1',key2:'value2', keyNULL:null,keyUNDEFINED:undefined};
     var result = {defaults:value,options:value};
     this.chain.defaultsReset(value);
@@ -367,11 +369,11 @@ catalogs.forEach(function(current,index, array){
                      current + " : returns entry value for 'key2' from default catalog." );
     assert.deepEqual( this.chain[current]('keyUNDEFINED'), value.keyUNDEFINED,
                      current + " : returns entry value for 'keyUNDEFINED' from default catalog." );
-    assert.deepEqual( this.chain[current]('keyNULL'),undefined,
-                     current + " : returns UNDEFINED instead of NULL entry value for 'keyNULL' from default catalog. Because UNDEFINED first found (from options catalog)" );
+    assert.deepEqual( this.chain[current]('keyNULL'),value.keyNULL,
+                     current + " : returns NULL entry value for 'keyNULL' from default catalog." );
   });
   /*-- 3. custom catalog initialized --*/
-  QUnit.test( "custom catalog initialized", function( assert ) {
+  QUnit.test( "only custom catalog initialized", function( assert ) {
     var value = {key1:'value1',key2:'value2', keyNULL:null,keyUNDEFINED:undefined};
     var result = {defaults:value,options:value};
     //this.chain.defaultsReset(value);
@@ -385,9 +387,79 @@ catalogs.forEach(function(current,index, array){
     assert.deepEqual( this.chain[current]('key2'),value.key2,
                      current + " : returns entry value for 'key2' from custom catalog." );
     assert.deepEqual( this.chain[current]('keyUNDEFINED'),value.keyUNDEFINED,
-                     current + " : returns entry value for entryKeyUNDEFINED from custom catalog." );
+                     current + " : returns undefined entry value for entryKeyUNDEFINED from custom catalog." );
     assert.deepEqual( this.chain[current]('keyNULL'),value.keyNULL,
-                     current + " : returns entry value for 'keyNULL' from custom catalog. NORMAL behaviour as NULL found first in the custom catalog" );
+                     current + " : returns null entry value for 'keyNULL' from custom catalog." );
   });
   
-}); 
+});
+/*
+=====================================
+Setting access with an argument  
+when optionFirst & ! optionFirst
+=====================================
+*/
+catalogs = ['settings'];
+/*
+=====================================
+Setting access with an argument  
+when optionFirst & ! optionFirst
+=====================================
+*/
+catalogs.forEach(function(current,index, array){
+  QUnit.module(current + ' [Setting access with an argument when optionFirst & ! optionFirst] ',{
+    beforeEach: function() {
+      this.chain = new Chain();
+      this.key = 'key';
+      this.defaultOnlyKey = 'defaultOnlyKey';
+      this.optionOnlyKey = 'optionOnlyKey';
+      this.defaults = {key:'default',defaultOnlyKey:'defaultOnly'};
+      this.options = {key:'option',optionOnlyKey:'optionOnly'};
+      this.chain.optionsReset(this.options);
+      this.chain.defaultsReset(this.defaults);
+    }
+  });
+  /*-- 1. default value --*/
+  QUnit.test( "optionFirst === true : empty catalogs", function( assert ) {
+    var emptySettings = {};
+    this.chain.optionsReset(emptySettings);
+    this.chain.defaultsReset(emptySettings);
+    assert.deepEqual( this.chain[current](this.key), undefined,
+                     current + " : optionFirst === true,  returns undefined value for 'this.key' from empty settings." );
+    assert.deepEqual( this.chain[current](this.defaultOnlyKey), undefined,
+                     current + " : optionFirst === true,  returns undefined value for 'this.defaultOnlyKey' from empty settings." );
+    assert.deepEqual( this.chain[current](this.optionOnlyKey), undefined,
+                     current + " : optionFirst === true,  returns undefined value for 'this.optionOnlyKey' from empty settings." );
+    /*
+     * this.chain.optionFirst(false);
+     */
+    this.chain.optionFirst(false);
+    assert.deepEqual( this.chain[current](this.key), undefined,
+                     current + " : optionFirst === false,  returns undefined value for 'this.key' from empty settings." );
+    assert.deepEqual( this.chain[current](this.defaultOnlyKey), undefined,
+                     current + " : optionFirst === false,  returns undefined value for 'this.defaultOnlyKey' from empty settings." );
+    assert.deepEqual( this.chain[current](this.optionOnlyKey), undefined,
+                     current + " : optionFirst === false,  returns undefined value for 'this.optionOnlyKey' from empty settings." );
+  });
+  /*
+   * populated settings 
+   */
+  QUnit.test( "optionFirst === true : populated settings", function( assert ) {
+    assert.deepEqual( this.chain[current](this.key), this.options[this.key],
+                     current + " : optionFirst === true,  returns option value for 'this.key' from  options." );
+    assert.deepEqual( this.chain[current](this.defaultOnlyKey), this.defaults[this.defaultOnlyKey],
+                     current + " : optionFirst === true,  returns default value for 'this.defaultOnlyKey' from defaults." );
+    assert.deepEqual( this.chain[current](this.optionOnlyKey), this.options[this.optionOnlyKey],
+                     current + " : optionFirst === true,  returns option value for 'this.optionOnlyKey' from options." );
+    /*
+     * this.chain.optionFirst(false);
+     */
+    this.chain.optionFirst(false);
+    assert.deepEqual( this.chain[current](this.key), this.defaults[this.key],
+                     current + " : optionFirst === false,  returns default value for 'this.key' from defaults." );
+    assert.deepEqual( this.chain[current](this.defaultOnlyKey), this.defaults[this.defaultOnlyKey],
+                     current + " : optionFirst === false,  returns default value for 'this.defaultOnlyKey' from defaults." );
+    assert.deepEqual( this.chain[current](this.optionOnlyKey), this.options[this.optionOnlyKey],
+                     current + " : optionFirst === false,  returns option value for 'this.optionOnlyKey' from options." );
+  });
+});
