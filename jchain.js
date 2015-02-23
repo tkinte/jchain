@@ -38,10 +38,10 @@ var Chain = function(){
   var _customHandlers = {};
   var _defaultWorkers = {};
   var _customWorkers = {};
-  _handlerFirst = true;
-  _customHandlerFirst = true;
-  _customWorkerFirst = true;
-  _optionFirst = true;
+  var _handlerFirst = true;
+  var _customHandlerFirst = true;
+  var _customWorkerFirst = true;
+  var _optionFirst = true;
   /*
   ====================================
   -- access utility method --
@@ -80,10 +80,13 @@ var Chain = function(){
     var defaultResult = _access(defaultTarget, args)[1];
     var customResult = _access(customTarget, args)[1];
     // when one is null and other undefined vice versa
-    // the 
-    return couple === 'settings' && this.optionFirst || 
-        couple === 'handlers' && this.customHandlerFirst ||
-        couple === 'workers' && this.customWorkerFirst  ? 
+    // return null.
+    if(defaultResult === null && typeof customResult === 'undefined' ||
+      typeof defaultResult === 'undefined' && customResult === null)
+      return null;
+    return couple === 'settings' && _optionFirst || 
+        couple === 'handlers' && _customHandlerFirst ||
+        couple === 'workers' && _customWorkerFirst ? 
         customResult ||defaultResult : 
         defaultResult||customResult;
   };
@@ -266,29 +269,30 @@ var Chain = function(){
   this.catalogsReset = function(){
     if(!arguments.length)
       return;
+    var args = arguments;
     var catalogs =
-        ['_defaults','_options','_defaultHandlers', 
-         '_customHandlers','_defaultWorkers','_customWorkers'];
+        ['defaults','options','defaultHandlers', 
+         'customHandlers','defaultWorkers','customWorkers'];
     catalogs.forEach(function(current,index, array){
-      if(arguments[0].hasOwnProperty(current))
+      if(args[0].hasOwnProperty(current))
         switch (current){
-          case catalogs[0] :
-            _defaults = arguments[0][current];
+          case catalogs[0] ://alert('in catalogsReset : ' + arguments[0][current]);
+            _defaults = args[0][current];
             break;
           case catalogs[1] :
-            _options = arguments[0][current];
+            _options = args[0][current];
             break;
           case catalogs[2] :
-            _defaultHandlers = arguments[0][current];
+            _defaultHandlers = args[0][current];
             break;
           case catalogs[3] :
-            _customHandlers = arguments[0][current];
+            _customHandlers = args[0][current];
             break;
           case catalogs[4] :
-            _defaultWorkers = arguments[0][current];
+            _defaultWorkers = args[0][current];
             break;
           case catalogs[5] :
-            _customWorkers = arguments[0][current];
+            _customWorkers = args[0][current];
             break;
         }
     });
@@ -386,13 +390,13 @@ var Chain = function(){
   ====================================
   */
   this.run = function(workName,parameters){
-    var settings = this.optionFirst ?
+    var settings = this.optionFirst() ?
         Object.assign({},this.defaults(),this.options(),parameters||{}) :
     Object.assign({},this.options(),parameters||{},this.defaults());
     var handler = this.handlers(workName||undefined);
     var work = this.workers(workName||undefined);
     var result = 
-        this.handlerFirst ? 
+        this.handlerFirst() ? 
         runHandler(handler, workName,settings) ||
         runWorker(work,workName,settings) 
     :  runWorker(work,workName,settings) ||
