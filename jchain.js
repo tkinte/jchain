@@ -55,7 +55,7 @@ var Chain = function(){
           undefined : [args[0],target[args[0]]] ;
     } else if (args.length >= 2){
       // more than one
-      if(target === undefined || target === null)
+      if(typeof target === 'undefined' || target === null)
         target = {};
       target[args[0]] = args[1];
     }
@@ -354,7 +354,7 @@ var Chain = function(){
           workName + '"] : ' + error.message;
         error.name = 'workerError';
         exceptions = error;
-      } 
+      }
       return new Result('ok',output,settings,exceptions);
     } else
       return undefined;
