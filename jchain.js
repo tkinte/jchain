@@ -92,6 +92,17 @@ var Chain = function(){
   };
   /*
   ====================================
+  -- this.settings method --
+  ====================================
+  */
+  _selectActive = function(booleanSwitch,defaults,options,parameters){
+    //alert(JSON.stringify(arguments));
+    return booleanSwitch ?
+      Object.assign({},defaults||{},options||{},parameters||{}) :
+      Object.assign({},options||{},parameters||{},defaults||{});
+  };
+  /*
+  ====================================
   -- this.defaults method --
   ====================================
   */
@@ -147,6 +158,16 @@ var Chain = function(){
   this.settings = function(){
     //alert(JSON.stringify(arguments));
     return _compoundAccess('settings',_defaults,_options,arguments);
+  };
+  /*
+  ====================================
+  -- this.settings method --
+  ====================================
+  */
+  this.activeSettings = function(parameters){
+    //alert(JSON.stringify(arguments));
+    return _selectActive(_optionFirst,_options,_defaults,
+                         parameters||undefined);
   };
   /*
   ====================================
@@ -207,6 +228,16 @@ var Chain = function(){
   };
   /*
   ====================================
+  -- this.activeWorkers method --
+  ====================================
+  */  
+  /*-- this.workers --*/
+  this.activeWorkers = function(paramters){
+    return _selectActive(_customWorkerFirst,_customWorkers,
+                         _defaultWorkers,paramters||undefined);
+  };
+  /*
+  ====================================
   -- this.defaultHandlers method --
   ====================================
   */
@@ -260,6 +291,15 @@ var Chain = function(){
   */
   this.handlers = function(){
     return _compoundAccess('handlers',_defaultHandlers,_customHandlers,arguments);
+  };
+  /*
+  ====================================
+  -- this.handlers method --
+  ====================================
+  */
+  this.activeHandlers = function(parameters){
+    return _selectActive(_customHandlerFirst,_customHandlers,
+                         _defaultHandlers,parameters||undefined);
   };
   /*
   ====================================
@@ -390,9 +430,7 @@ var Chain = function(){
   ====================================
   */
   this.run = function(workName,parameters){
-    var settings = this.optionFirst() ?
-        Object.assign({},this.defaults(),this.options(),parameters||{}) :
-    Object.assign({},this.options(),parameters||{},this.defaults());
+    var settings = this.activeSettings(parameters||undefined);
     var handler = this.handlers(workName||undefined);
     var work = this.workers(workName||undefined);
     var result = 
