@@ -166,7 +166,7 @@ var Chain = function(){
   */
   this.activeSettings = function(parameters){
     //alert(JSON.stringify(arguments));
-    return _selectActive(_optionFirst,_options,_defaults,
+    return _selectActive(_optionFirst,_defaults,_options,
                          parameters||undefined);
   };
   /*
@@ -233,8 +233,8 @@ var Chain = function(){
   */  
   /*-- this.workers --*/
   this.activeWorkers = function(paramters){
-    return _selectActive(_customWorkerFirst,_customWorkers,
-                         _defaultWorkers,paramters||undefined);
+    return _selectActive(_customWorkerFirst,_defaultWorkers,
+                         _customWorkers,paramters||undefined);
   };
   /*
   ====================================
@@ -298,8 +298,8 @@ var Chain = function(){
   ====================================
   */
   this.activeHandlers = function(parameters){
-    return _selectActive(_customHandlerFirst,_customHandlers,
-                         _defaultHandlers,parameters||undefined);
+    return _selectActive(_customHandlerFirst,_defaultHandlers,
+                         _customHandlers,parameters||undefined);
   };
   /*
   ====================================
