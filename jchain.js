@@ -95,7 +95,7 @@ var Chain = function(){
   -- this.settings method --
   ====================================
   */
-  _selectActive = function(booleanSwitch,defaults,options,parameters){
+  var _selectActive = function(booleanSwitch,defaults,options,parameters){
     //alert(JSON.stringify(arguments));
     return booleanSwitch ?
       Object.assign({},defaults||{},options||{},parameters||{}) :
